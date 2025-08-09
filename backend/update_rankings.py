@@ -1,5 +1,7 @@
 # backend/update_rankings.py
 from uniqueness_calc import compute_global_player_rankings
+from backend.uniqueness_calc import compute_global_player_rankings
+
 import pandas as pd
 
 player_matrix = pd.read_csv("backend/data/PlayerMatrix.csv")

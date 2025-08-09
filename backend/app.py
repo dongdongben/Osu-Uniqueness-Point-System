@@ -3,6 +3,13 @@ import pandas as pd
 from uniqueness_calc import compute_uniqueness_for_player, compute_global_player_rankings, load_usernames
 from flask import send_file
 
+from backend.uniqueness_calc import (
+    compute_uniqueness_for_player,
+    compute_global_player_rankings,
+    load_usernames,
+)
+
+
 app = Flask(__name__)
 
 # === Run once at startup ===
