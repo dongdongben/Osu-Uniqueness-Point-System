@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Osu! Uniqueness Project{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Osu! Uniqueness Point (UP) Algorithm Project</h1>
+
+<p>
+This project introduces a new ranking system called <strong>Uniqueness Points (UP)</strong>, a product of the 
+traditional osu! performance points (pp) and a <strong>multiplier</strong> based on the appearance count of maps amongst top players and
+the distribution of the scores set on the map
+</p>
+
+<h2>How It Works:</h2>
+<ul>
+<ol>
+    <li class="main-step">From the top 500 players' top 100 best performance, collect the following data:</li>
+        <p style="line-height: 1.4;">
+        <strong>Appearance Count</strong> — every map's appearance count amongst the 50,000 submitted scores<br>
+            <span style="display:inline-block; margin-left: 20px;">
+            i.e. <em>Songs Compilation VI [Collab Extra]</em> has an appearance count of <strong>18</strong> because
+            18&nbsp;/&nbsp;500 players have this map in their top&nbsp;100.
+            </span>
+        </p>
+
+        <p style="line-height: 1.4;">
+        <strong>Placement Data</strong> - a set of numbers recording where the map places in player top plays<br>
+            <span style="display:inline-block; margin-left: 20px;">
+            i.e. <em>Songs Compilation VI [Collab Extra]</em> holds position <strong>1, 9, 3, 1, 1, 
+            1, 21, 38, 76, 37, 32, 42, 73, 62, 94, 24, 23, 28</strong> for 18 players
+            </span> 
+        </p>
+
+        <p style="line-height: 1.4;">
+        <strong>Total Weighted PP</strong> - for each map, the sum of weighted pp taken from the 50,000 submitted scores<br>
+            <span style="display:inline-block; margin-left: 20px;">
+            i.e. By adding the weighted pp of the 18 scores on <em>Songs Compilation VI [Collab Extra]</em>, we get <strong>10902.1084</strong>
+            </span> 
+        </p>
+
+    <li class="main-step">From the data above:</li>
+    <p style="line-height: 1.4;"></p>
+        <p style="line-height:1.4; margin:0;">
+        (1) Plot the Weighted PP graph, sorted from high to low
+            <details id="ppPlotDetails" style="display:inline; margin-left:20px;">
+                <summary id="ppPlotSummary" style="display:inline; cursor:pointer; color:#ff66aa;">
+                [Show Plot]
+                </summary>
+                <div id="ppPlot" style="width:100%; height:460px; margin-top:8px;"></div>
+            </details>
+        </p>
+
+        <p style="line-height:1.4; margin:0;">
+        (2) Plot the Appearance Count graph, sorted in the same order as the Weighted PP graph
+            <details id="acPlotDetails" style="display:inline; margin-left:20px;">
+                <summary id="acPlotSummary" style="display:inline; cursor:pointer; color:#ff66aa;">
+                [Show Plot]
+                </summary>
+                <div id="acPlot" style="width:100%; height:460px; margin-top:8px;"></div>
+            </details>
+        </p>
+
+        <p style="line-height:1.4; margin:0;">
+        (3) Fit a curve (reciprocal) to Weighted PP graph, scale it to the Appearance Count graph, and find the highest point of curvature (elbow)
+        <details id="fitPlotDetails" style="display:inline; margin-left:20px;">
+            <summary id="fitPlotSummary" style="display:inline; cursor:pointer; color:#ff66aa;">[Show Plot]</summary>
+            <div id="fitPlot" style="width:100%; height:480px; margin-top:8px;"></div>
+        </details>
+        </p>
+
+        <p style="line-height:1.4;">
+        (4) Compute the <strong>skewness</strong> of the Placement data (if above the elbow)
+                <span style="display:inline-block; margin-left: 20px;">
+                i.e. From the Placement Data of <em>Songs Compilation VI [Collab Extra]</em>, we get the skewness of 0.671
+                </span> 
+        </p>
+
+    <li class="main-step">Taking the y-coordinate of the elbow point (currently <strong>18</strong>), apply a different formula to maps above and below this value:</li>
+
+    <ul style="margin-top:6px; font-size:15x;">
+    <li>
+        <strong>Below the elbow</strong> ($\text{AppearanceCount} < 18$):
+        <br>
+        $$ \text{UniquenessPoint} = \text{BasePP} \times 1.2^{-(\text{AppearanceCount} + 11.62925)} + 1.05 $$
+    </li>
+
+    <li style="margin-top:12px;">
+        <strong>At or above the elbow</strong> ($\text{AppearanceCount} \geq 18$):
+        <br>
+        $$ \text{UniquenessPoint} = \text{BasePP} \times 0.93^{\text{Skewness} \times \left( 2^{\frac{\text{AppearanceCount}}{250}} - 0.2 \right)} $$
+        where $250 = \text{Total Players}/2$.
+    </li>
+    </ul>
+
+</ol>
+</ul>
+
+<h2>Formula Explanation:</h2>
+
+<p>
+    Maps below the elbow point are identified as uncontested/uncontestable, the value of these scores will receive a simple 
+    multiplier that scales with the appearance count, lowest appearance receives the maximum buff of 1.15x, while maps that are closest
+    to the elbow point (17) receives the minimum buff of 1.05x. Increasing appearance count drastically lowers this factor.
+</p>
+<p>
+    The formula encourages unique scores to be challenged so its multiplier will be brought down
+</p>
+<br>
+<p>
+    Maps that are above the elbow point can be properly evaluated by its skewness of placement data. Positive skew maps
+    receives a nerf, negative skew maps receive a buff. The popularity index is multiplied to the skewness to give a more accurate
+    buff/nerf. High appearance count will make the skewness more effective than low appearance count.
+</P>
+<P>
+    The formula identifies over-abused maps and punishes them, while slightliy buffing maps that are popular yet difficult for most
+    players
+</p>
+<h2>Motives:</h2>
+
+<p>
+With the recent change in the ranking criteria, the performance point ranking system has become heavily mapper depended - 
+the types of maps that mappers are able to mass-produce heavily influences the viability of the skillsets to rank up
+</p>
+
+<p>
+The Uniqueness Point reduces the influence of maps that are tailored to farming performance points, since maps that have high 
+skewness (many placement data are high) will be punished, while maps with negative
+skewness (many placement data are low) will be buffed. If the maps can't be evaluated properly by its skewness, 
+it is rather uncontested and will receive a decaying buff depending on the appearance count
+</p>
+
+<h2>Try It:</h2>
+<p>
+Visit <a href="/ranking">Rankings</a> to explore the adjusted leaderboard, or click on a player to view their profile.
+</p>
+
+<br>
+
+<h2>Q & A</h2>
+<p>
+will update this section for commonly asked questions in the future
+</p>
+<br>
+
+<h3>Contact me for suggestions:</h3>
+<p>
+    In game: 
+    <a href="https://osu.ppy.sh/users/17082379" target="_blank" rel="noopener noreferrer"
+       style="color:#ff66aa; text-decoration:none;">
+        dongdongben
+    </a>
+    <br>
+    Discord: <span style="font-family: monospace; color:#ff66aa;">dongdongben</span>
+</p>
+
+
+
+
+{% endblock %}
+
+
+
+

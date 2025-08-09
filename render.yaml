@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: osu-up-web
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers=2 --threads=4 --timeout=120
+    autoDeploy: true
+    disk:
+      name: data-disk
+      mountPath: /opt/render/project/src/backend/data
+      sizeGB: 2
+    envVars:
+      - key: OSU_CLIENT_ID
+        sync: false
+      - key: OSU_CLIENT_SECRET
+        sync: false
+
+  - type: cron
+    name: osu-up-daily-refresh
+    env: python
+    schedule: "0 3 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python update_rankings.py
+    disk:
+      name: data-disk
+      mountPath: /opt/render/project/src/backend/data
+      sizeGB: 2

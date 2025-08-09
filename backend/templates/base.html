@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Osu! Uniqueness Project{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <style>
+        html, body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9fb;
+        }
+
+        nav {
+            background-color: #ff66aa;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dataTables_wrapper {
+            width: 90%;
+            margin: 0 auto !important;  /* override default */
+            padding-top: 0 !important;  /* prevent spacing below nav */
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 25px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 40px 60px;
+            max-width: 2000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* osu themed row highlights */
+        .osu-gold {
+            background-color: #ffe5f0 !important;
+        }
+
+        .osu-green {
+            background-color: #e3ffe3 !important;
+        }
+
+        .osu-grey {
+            background-color: #eeeeee !important;
+        }
+
+        /* osu pink hover for any table row */
+        tr:hover {
+            background-color: #ffe0ef !important;
+            transition: background-color 0.3s ease;
+            border-left: 4px solid #ff66aa;
+        }
+
+    </style>
+
+    <script>
+    window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+    };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/ranking">Rankings</a>
+</nav>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+(async function () {
+  let plottedAll = false;
+
+  async function loadAndPlotAll() {
+    if (plottedAll) return;
+
+    const resp = await fetch('/data/weightedpp_all.json', { cache: 'no-store' });
+    const data = await resp.json();
+
+    if (!data.y || !data.y.length) {
+      document.getElementById('ppPlot').innerHTML =
+        '<div style="color:#888;padding:8px;">No numeric data returned.</div>';
+      console.log('weightedpp_all.json error:', data.error);
+      return;
+    }
+
+    const y = data.y;                   // full sorted list
+    const names = data.x;               // parallel names for hover
+    const x = Array.from({ length: y.length }, (_, i) => i + 1); // numeric index 1..N
+
+    Plotly.newPlot('ppPlot', [{
+      type: 'scattergl',                // WebGL for large datasets
+      mode: 'markers',
+      x, y,
+      text: names,
+      hovertemplate: '<b>%{text}</b><br>Total Weighted PP: %{y:.2f}<extra></extra>',
+      marker: { size: 4, opacity: 0.75, color: '#ff66aa' },
+      name: 'Weighted PP'
+    }], {
+      margin: { t: 30, r: 10, b: 50, l: 60 },
+      title: `Weighted PP Plot (All ${y.length})`,
+      xaxis: { title: 'Beatmap Index' },
+      yaxis: { title: 'Total Weighted PP' }
+    }, { displaylogo: false });
+
+    plottedAll = true;
+  }
+
+  // hook your existing details toggle
+  const det = document.getElementById('ppPlotDetails');
+  const sum = document.getElementById('ppPlotSummary');
+  if (det && sum) {
+    det.addEventListener('toggle', () => {
+      sum.textContent = det.open ? '[Hide Plot]' : '[Show Plot]';
+      if (det.open) loadAndPlotAll();
+    });
+  }
+})();
+</script>
+
+<script>
+(function () {
+  let plottedAC = false;
+
+  async function loadAndPlotAppearance() {
+    if (plottedAC) return;
+
+    const resp = await fetch('/data/appearance_aligned.json', { cache: 'no-store' });
+    const data = await resp.json();
+
+    if (!data.app || !data.app.length) {
+      document.getElementById('acPlot').innerHTML =
+        '<div style="color:#888;padding:8px;">No appearance data returned.</div>';
+      console.log('appearance_aligned.json error:', data.error);
+      return;
+    }
+
+    const y = data.app;                 // appearance counts, aligned to pp order
+    const names = data.names || [];     // hover names
+    const x = Array.from({ length: y.length }, (_, i) => i + 1); // 1..N
+
+    Plotly.newPlot('acPlot', [{
+      type: 'scattergl',                // WebGL for big arrays
+      mode: 'markers',
+      x, y,
+      text: names,
+      hovertemplate: '<b>%{text}</b><br>Appearance Count: %{y}<extra></extra>',
+      marker: { size: 4, opacity: 0.75, color: '#52c41a' }, // osu-style green
+      name: 'Appearance Count'
+    }], {
+      margin: { t: 30, r: 10, b: 50, l: 60 },
+      title: `Appearance Count Plot (All ${y.length}, pp-sorted)`,
+      xaxis: { title: 'Beatmap Index (same order as Weighted PP)' },
+      yaxis: { title: 'Appearance Count' }
+    }, { displaylogo: false });
+
+    plottedAC = true;
+  }
+
+  const det = document.getElementById('acPlotDetails');
+  const sum = document.getElementById('acPlotSummary');
+  if (det && sum) {
+    det.addEventListener('toggle', () => {
+      sum.textContent = det.open ? '[Hide Plot]' : '[Show Plot]';
+      if (det.open) loadAndPlotAppearance();
+    });
+  }
+})();
+</script>
+
+<script>
+(function () {
+  let plottedFit = false;
+
+  async function loadAndPlotFit() {
+    if (plottedFit) return;
+
+    const resp = await fetch('/data/fit_scaled_elbow.json', { cache: 'no-store' });
+    const data = await resp.json();
+
+    if (!data.fit_scaled || !data.fit_scaled.length) {
+      document.getElementById('fitPlot').innerHTML =
+        '<div style="color:#888;padding:8px;">No data for fit/appearance.</div>';
+      console.log('fit_scaled_elbow.json error:', data.error);
+      return;
+    }
+
+    const x     = data.x;
+    const names = data.names || [];
+    const app   = data.app;
+    const fit   = data.fit_scaled;
+    const elbow = data.elbow || { x: null, y: null };
+
+    const traces = [
+      // Appearance markers
+      {
+        type: 'scattergl',
+        mode: 'markers',
+        x, y: app,
+        text: names,
+        hovertemplate: '<b>%{text}</b><br>Appearance: %{y}<extra></extra>',
+        marker: { size: 4, opacity: 0.75, color: '#52c41a' }, // osu green
+        name: 'Appearance Count'
+      },
+      // Scaled fit line
+      {
+        type: 'scatter',
+        mode: 'lines',
+        x, y: fit,
+        hoverinfo: 'skip',
+        line: { width: 2 },
+        name: 'Scaled Fit (a/(x+b) → scaled to Appearance)'
+      }
+    ];
+
+    // Elbow marker
+    if (Number.isFinite(elbow.x) && Number.isFinite(elbow.y)) {
+      traces.push({
+        type: 'scatter',
+        mode: 'markers',
+        x: [elbow.x],
+        y: [elbow.y],
+        text: [`Elbow @ x=${elbow.x}`],
+        hovertemplate: 'Elbow: %{x}, %{y:.2f}<extra></extra>',
+        marker: { size: 15, color: '#fa141fff', symbol: 'star' }, // yellow star
+        name: 'Elbow Point'
+      });
+    }
+
+    Plotly.newPlot('fitPlot', traces, {
+      margin: { t: 30, r: 10, b: 50, l: 60 },
+      title: 'Appearance Count with Scaled Fit & Elbow',
+      xaxis: { title: 'Beatmap Index (pp-sorted)' },
+      yaxis: { title: 'Appearance Count' }
+    }, { displaylogo: false });
+
+    plottedFit = true;
+  }
+
+  const det = document.getElementById('fitPlotDetails');
+  const sum = document.getElementById('fitPlotSummary');
+  if (det && sum) {
+    det.addEventListener('toggle', () => {
+      sum.textContent = det.open ? '[Hide Plot]' : '[Show Plot]';
+      if (det.open) loadAndPlotFit();
+    });
+  }
+})();
+</script>
+
+<script>
+// swap [Show Plot] <-> [Hide Plot]
+document.querySelectorAll('.toggle-plot').forEach(d => {
+    const s = d.querySelector('.toggle-summary');
+    d.addEventListener('toggle', () => {
+    s.textContent = d.open ? '[Hide Plot]' : '[Show Plot]';
+    });
+});
+</script>
+
+<style>
+.main-step {
+    font-size: 18px;
+    font-weight: 600;
+}
+</style>
+
+</body>
+</html>

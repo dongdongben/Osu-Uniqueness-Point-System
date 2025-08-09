@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ name }}'s Top Plays</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 30px 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 30px;
+        }
+
+        .dataTables_wrapper {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        #upTable tbody tr.odd {
+            background-color: #fff !important;
+        }
+
+        #upTable tbody tr.even {
+            background-color: #f9f9f9 !important;
+        }
+
+        #upTable tbody tr:hover {
+            background-color: #e6f7ff !important;
+            transition: background-color 0.3s ease;
+            border-left: 4px solid #1890ff;
+        }
+    </style>
+</head>
+<body>
+
+
+{% extends "base.html" %}
+{% block title %}...{% endblock %}
+{% block content %}
+<h1>{{ name }}'s Top Plays</h1>
+
+<table id="upTable">
+    <thead>
+    <tr>
+        <th>Placement</th>
+        <th>Beatmap ID</th>
+        <th>Title</th>
+        <th>Base PP</th>
+        <th>Uniqueness PP</th>
+        <th>Delta</th>
+        <th>Appearance Count</th>
+        <th>Skewness</th>
+        <th>Popularity Index</th>
+        <th>Factor</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for play in scores %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ play.BeatmapID }}</td>
+            <td>{{ play.BeatmapName }}</td>
+            <td>{{ "%.2f"|format(play.BasePP) }}</td>
+            <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
+            <td>{{ "%.2f"|format(play.Delta) }}</td>
+            <td>{{ play.AppearanceCount }}</td>
+            <td>{{ "%.3f"|format(play.Skewness) }}</td>
+            <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
+            <td>{{ "%.3f"|format(play.Factor) }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+<!-- jQuery & DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#upTable').DataTable({
+            order: [[3, 'desc']], // Default sort by Uniqueness PP
+            paging: false,
+            searching: false,
+            lengthChange: false,
+            columnDefs: [
+                { orderable: true, targets: [3, 4] },  // Allow sorting on UP and Delta
+                { orderable: false, targets: '_all' } // Disable sorting for all other columns
+            ]
+        });
+    });
+</script>
+
+</body>
+</html>
