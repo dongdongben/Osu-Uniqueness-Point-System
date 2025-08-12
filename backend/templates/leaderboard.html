@@ -68,7 +68,8 @@
 
 
 {% extends "base.html" %}
-{% block title %}...{% endblock %}
+{% block title %}{{ name }}'s Top Plays{% endblock %}
+
 {% block content %}
 <h1>{{ name }}'s Top Plays</h1>
 
@@ -84,11 +85,12 @@
         <th>Appearance Count</th>
         <th>Skewness</th>
         <th>Popularity Index</th>
-        <th>Factor</th>
+        <th>Multiplier</th>
     </tr>
     </thead>
     <tbody>
     {% for play in scores %}
+        {% set mult = (play.BasePP and play.UniquenessPP) and (play.UniquenessPP / play.BasePP) or 0 %}
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ play.BeatmapID }}</td>
@@ -99,7 +101,7 @@
             <td>{{ play.AppearanceCount }}</td>
             <td>{{ "%.3f"|format(play.Skewness) }}</td>
             <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
-            <td>{{ "%.3f"|format(play.Factor) }}</td>
+            <td>{{ "%.3f"|format(mult) }}</td>
         </tr>
     {% endfor %}
     </tbody>
@@ -113,13 +115,13 @@
 <script>
     $(document).ready(function () {
         $('#upTable').DataTable({
-            order: [[3, 'desc']], // Default sort by Uniqueness PP
+            order: [[4, 'desc']], // default sort by Uniqueness PP
             paging: false,
             searching: false,
             lengthChange: false,
             columnDefs: [
-                { orderable: true, targets: [3, 4] },  // Allow sorting on UP and Delta
-                { orderable: false, targets: '_all' } // Disable sorting for all other columns
+                { orderable: false, targets: [0, 1, 2] },  // disable sorting for Placement, Beatmap ID, Title
+                { type: 'num', targets: [3, 4, 5, 6, 7, 8, 9] } // numeric sort for the rest
             ]
         });
     });
