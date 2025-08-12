@@ -11,101 +11,118 @@
           href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
 
     <style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #fafafa;
-        margin: 0;
-        padding: 30px 0;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 30px 0;
+        }
 
-    h1 {
-        text-align: center;
-        font-size: 32px;
-        font-weight: 600;
-        color: #222;
-        margin-bottom: 30px;
-    }
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 30px;
+        }
 
-    /* Center the DataTables wrapper + keep it narrow enough */
-    .dataTables_wrapper {
-        width: 90%;
-        margin: 0 auto !important;   /* center */
-    }
+        .dataTables_wrapper {
+            width: calc(100% - 20px); /* 10px padding each side */
+            margin: 0 auto;
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 15px;
-        margin: 0 auto;              /* belt-and-suspenders centering */
-        box-shadow: none;            /* no table shadow */
-    }
+        }
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-        box-shadow: none;            /* no cell shadow */
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            margin: 0 auto;
+            box-shadow: none; 
+        }
 
-    th {
-        background-color: #f2f2f2;
-        font-weight: 600;
-        font-size: 17px;
-    }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            box-shadow: none;            /* no cell shadow */
+        }
 
-    /* Remove DataTables header gradients/arrows “shadowy” look */
-    table.dataTable thead th,
-    table.dataTable thead td {
-        background-image: none !important;
-    }
-    table.dataTable thead .sorting,
-    table.dataTable thead .sorting_asc,
-    table.dataTable thead .sorting_desc,
-    table.dataTable thead .sorting_asc_disabled,
-    table.dataTable thead .sorting_desc_disabled {
-        background-image: none !important;
-        background-color: #f2f2f2 !important;
-    }
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0 auto;
+        }
+        
+        /* Force fixed layout so widths stick */
+        #upTable {
+            table-layout: fixed;
+            width: 100%;
+        }
 
-    /* Keep zebra stripes */
-    #upTable tbody tr.odd  { background-color: #fff !important; }
-    #upTable tbody tr.even { background-color: #f9f9f9 !important; }
+        /* Wider title column */
+        #upTable th:nth-child(3),
+        #upTable td:nth-child(3) {
+            width: 35%;   /* give title more space */
+            text-align: left;
+        }
 
-    /* Restore osu pink hover with left accent */
-    /* Use td-first-child because borders on <tr> don’t render */
-    #upTable tbody tr:hover td {
-        background-color: #ffe0ef !important;
-        transition: background-color 0.2s ease;
-    }
-    #upTable tbody tr:hover td:first-child {
-        border-left: 4px solid #ff66aa;
-    }
+        /* Narrower small-data columns */
+        #upTable th:nth-child(1),
+        #upTable td:nth-child(1) { width: 6%; }  /* Placement */
+        #upTable th:nth-child(2),
+        #upTable td:nth-child(2) { width: 12%; } /* Beatmap ID */
+        #upTable th:nth-child(4),
+        #upTable td:nth-child(4),
+        #upTable th:nth-child(5),
+        #upTable td:nth-child(5),
+        #upTable th:nth-child(6),
+        #upTable td:nth-child(6),
+        #upTable th:nth-child(7),
+        #upTable td:nth-child(7),
+        #upTable th:nth-child(8),
+        #upTable td:nth-child(8),
+        #upTable th:nth-child(9),
+        #upTable td:nth-child(9),
+        #upTable th:nth-child(10),
+        #upTable td:nth-child(10) {
+            width: 12%;
+        }
 
-    /* Remove dotted focus outlines/blue highlight on clicked rows */
-    #upTable tbody tr:focus,
-    #upTable tbody td:focus {
-        outline: none;
-    }
+        table.dataTable th, 
+        table.dataTable td {
+            word-wrap: break-word; /* wrap long text if needed */
+        }
 
-    /* Center the DataTables wrapper */
-    .dataTables_wrapper {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto !important;
-    }
+        /* Remove DataTables header gradients/arrows “shadowy” look */
+        table.dataTable thead th,
+        table.dataTable thead td {
+            background-image: none !important;
+        }
+        table.dataTable thead .sorting,
+        table.dataTable thead .sorting_asc,
+        table.dataTable thead .sorting_desc,
+        table.dataTable thead .sorting_asc_disabled,
+        table.dataTable thead .sorting_desc_disabled {
+            background-image: none !important;
+            background-color: #f2f2f2 !important;
+        }
 
-    /* Remove DataTables' default striping */
-    table.dataTable.stripe tbody tr.odd,
-    table.dataTable.display tbody tr.odd,
-    table.dataTable.stripe tbody tr.even,
-    table.dataTable.display tbody tr.even {
-    background-color: #fff !important;
-    }
+        /* Restore osu pink hover with left accent */
+        /* Use td-first-child because borders on <tr> don’t render */
+        #upTable tbody tr:hover td {
+            background-color: #ffe0ef !important;
+            transition: background-color 0.2s ease;
+        }
+        #upTable tbody tr:hover td:first-child {
+            border-left: 4px solid #ff66aa;
+        }
 
-    /* Keep your pink left bar on hover (works with border-collapse) */
-    #upTable tbody tr:hover td:first-child {
-    box-shadow: inset 4px 0 0 #ff66aa !important;
-    }
+        /* Remove dotted focus outlines/blue highlight on clicked rows */
+        #upTable tbody tr:focus,
+        #upTable tbody td:focus {
+            outline: none;
+        }
 
     </style>
 </head>
@@ -121,15 +138,15 @@
 <table id="upTable">
     <thead>
     <tr>
-        <th>Placement</th>
-        <th>Beatmap ID</th>
+        <th>Rank</th>
+        <th>MapID</th>
         <th>Title</th>
         <th>Base PP</th>
-        <th>Uniqueness PP</th>
+        <th>UP</th>
         <th>Delta</th>
-        <th>Appearance Count</th>
-        <th>Skewness</th>
-        <th>Popularity Index</th>
+        <th>Appear. Count</th>
+        <th>Skew</th>
+        <th>Pop. Index</th>
         <th>Multiplier</th>
     </tr>
     </thead>
@@ -138,7 +155,7 @@
         {% set mult = (play.BasePP and play.UniquenessPP) and (play.UniquenessPP / play.BasePP) or 0 %}
         <tr>
             <td>{{ loop.index }}</td>
-            <td>{{ play.BeatmapID }}</td>
+            <td>{{ play.BeatmapID|int }}</td>
             <td>{{ play.BeatmapName }}</td>
             <td>{{ "%.2f"|format(play.BasePP) }}</td>
             <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
@@ -159,16 +176,16 @@
 
 <script>
 $(document).ready(function () {
-  $('#upTable').DataTable({
-    order: [[4, 'desc']],
-    pageLength: 100,
-    lengthChange: false,
-    ordering: true,
-    searching: false,
-    stripeClasses: [],                 // ← no alternating greys
-    columnDefs: [
-      { orderable: false, targets: [0, 1, 2] }
-    ]
+    $('#upTable').DataTable({
+        order: [[4, 'desc']],
+        pageLength: 50,
+        lengthChange: false,
+        ordering: true,
+        searching: false,  
+        info: false,               // optional: hide "Showing X of Y entries"
+        columnDefs: [
+        { orderable: false, targets: [0, 1, 2] }
+        ]
   });
 });
 

@@ -22,7 +22,7 @@ def estimate_uniqueness(beatmap_id: int, base_pp: float, appearance_count: int, 
         factor = skewness * (2 ** (appearance_count / (TOTAL_PLAYERS / 2)) - 0.2)
         return base_pp * (0.93 ** factor)
     else:
-        return base_pp * ((1.2 ** (-appearance_count - 11.62925)) + 1.05)
+        return base_pp * ((1.15 ** (-appearance_count - 11.678393)) + 0.98)
 
 @lru_cache(maxsize=None)
 def estimate_uniqueness_cached(beatmap_id, base_pp, appearance_count, skewness, threshold):
