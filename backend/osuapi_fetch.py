@@ -4,6 +4,7 @@ import csv
 import time
 import os
 
+
 client_id = int(os.environ["OSU_CLIENT_ID"])
 client_secret = os.environ["OSU_CLIENT_SECRET"]
 api = Ossapi(client_id, client_secret)
