@@ -30,7 +30,7 @@ jobs:
         run: python backend/osuapi_fetch.py
 
       - name: Update global rankings
-        run: python backend/update_rankings.py
+        run: python -m backend.update_rankings
 
       - name: Commit and push updated CSVs
         run: |
