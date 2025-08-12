@@ -10,127 +10,96 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fafafa;
-            margin: 0;
-            padding: 30px 0;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 32px;
-            font-weight: 600;
-            color: #222;
-            margin-bottom: 30px;
-        }
-
-        .dataTables_wrapper {
-            width: 90%;
-            margin: 0 auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 15px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            font-weight: 600;
-            font-size: 17px;
-        }
-
-        #upTable tbody tr.odd {
-            background-color: #fff !important;
-        }
-
-        #upTable tbody tr.even {
-            background-color: #f9f9f9 !important;
-        }
-
-        #upTable tbody tr:hover {
-            background-color: #e6f7ff !important;
-            transition: background-color 0.3s ease;
-            border-left: 4px solid #1890ff;
-        }
-    </style>
-</head>
-<body>
-
-
 {% extends "base.html" %}
 {% block title %}{{ name }}'s Top Plays{% endblock %}
 
 {% block content %}
 <h1>{{ name }}'s Top Plays</h1>
 
-<!-- It’s fine to load CSS here; head isn’t required -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-<table id="upTable">
+<style>
+  /* Keep headers on one line except Title */
+  #upTable th:not(.col-title),
+  #upTable td:not(.col-title) { white-space: nowrap; }
+
+  /* Let title wrap normally */
+  #upTable th.col-title, #upTable td.col-title { white-space: normal; }
+
+  /* Right-align numeric columns */
+  .num { text-align: right; }
+
+  /* Slightly tighter rows */
+  #upTable td, #upTable th { padding: 8px 10px; vertical-align: middle; }
+
+  /* Move search box to the left; give it a placeholder */
+  div.dataTables_filter { float: left !important; text-align: left !important; }
+  div.dataTables_filter input { width: 220px; }
+
+  /* Keep the table full width inside our container */
+  .dataTables_wrapper { width: 100%; margin: 0 auto; }
+</style>
+
+<table id="upTable" style="width:100%">
   <thead>
     <tr>
-      <th>Placement</th>
-      <th>Beatmap ID</th>
-      <th>Title</th>
-      <th>Base PP</th>
-      <th>Uniqueness PP</th>
-      <th>Delta</th>
-      <th>Appearance Count</th>
-      <th>Skewness</th>
-      <th>Popularity Index</th>
-      <th>Factor</th>
+      <th class="num">Placement</th>
+      <th class="num">Beatmap ID</th>
+      <th class="col-title">Title</th>
+      <th class="num">Base PP</th>
+      <th class="num">Uniqueness PP</th>
+      <th class="num">Delta</th>
+      <th class="num">Appearance Count</th>
+      <th class="num">Skewness</th>
+      <th class="num">Popularity Index</th>
+      <th class="num">Multiplier</th>
     </tr>
   </thead>
   <tbody>
     {% for play in scores %}
     <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ play.BeatmapID }}</td>
-      <td>{{ play.BeatmapName }}</td>
-      <td>{{ "%.2f"|format(play.BasePP) }}</td>
-      <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
-      <td>{{ "%.2f"|format(play.Delta) }}</td>
-      <td>{{ play.AppearanceCount }}</td>
-      <td>{{ "%.3f"|format(play.Skewness) }}</td>
-      <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
-      <td>{{ "%.3f"|format(play.Factor) }}</td>
+      <td class="num">{{ loop.index }}</td>
+      <td class="num">{{ play.BeatmapID }}</td>
+      <td class="col-title">{{ play.BeatmapName }}</td>
+      <td class="num">{{ "%.2f"|format(play.BasePP) }}</td>
+      <td class="num">{{ "%.2f"|format(play.UniquenessPP) }}</td>
+      <td class="num">{{ "%.2f"|format(play.Delta) }}</td>
+      <td class="num">{{ play.AppearanceCount }}</td>
+      <td class="num">{{ "%.3f"|format(play.Skewness) }}</td>
+      <td class="num">{{ "%.3f"|format(play.PopularityIndex) }}</td>
+      <td class="num">{{ "%.3f"|format(play.UniquenessPP / play.BasePP) }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
 
-<!-- jQuery + DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
 <script>
-$(function () {
-  // Make sure it runs; you should see this in DevTools console once.
-  console.log('Initializing DataTable on #upTable');
-
-  $('#upTable').DataTable({
-    pageLength: 100,
-    lengthChange: false,
-    searching: true,
-    ordering: true,
-    // Treat numeric columns as numeric
-    columnDefs: [
-      { type: 'num', targets: [0,1,3,4,5,6,7,8,9] },
-      // Only these columns are sortable; disable Beatmap Title if you want
-      { orderable: true, targets: [0,1,2,3,4,5,6,7,8,9] }
-    ],
-    order: [[4, 'desc']] // default: Uniqueness PP desc
-  });
+$('#upTable').DataTable({
+  pageLength: 100,
+  lengthChange: false,
+  searching: true,
+  ordering: true,
+  autoWidth: false,
+  order: [[4, 'desc']], // default sort by Uniqueness PP (index 4)
+  columnDefs: [
+    { orderable: false, targets: [0, 1, 2] },   // disable sorting on Placement, Beatmap ID, Title
+    { targets: '_all', className: 'num' }       // keep numerics right-aligned
+  ],
+  columns: [
+    { width: '90px'  },  // Placement
+    { width: '120px' },  // Beatmap ID
+    { width: '40%'   },  // Title
+    { width: '110px' },  // Base PP
+    { width: '130px' },  // Uniqueness PP
+    { width: '100px' },  // Delta
+    { width: '140px' },  // Appearance Count
+    { width: '110px' },  // Skewness
+    { width: '140px' },  // Popularity Index
+    { width: '110px' }   // Multiplier
+  ]
 });
+
 </script>
 {% endblock %}
