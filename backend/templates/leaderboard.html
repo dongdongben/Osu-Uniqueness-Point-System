@@ -107,8 +107,6 @@
     </tbody>
 </table>
 
-{% endblock %}
-
 <!-- jQuery & DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -116,16 +114,15 @@
     $(document).ready(function () {
         $('#upTable').DataTable({
             order: [[4, 'desc']], // default sort by Uniqueness PP
-            paging: false,
-            searching: false,
+            pageLength: 50,
             lengthChange: false,
+            ordering: true,
+            searching: false,
             columnDefs: [
-                { orderable: false, targets: [0, 1, 2] },  // disable sorting for Placement, Beatmap ID, Title
-                { type: 'num', targets: [3, 4, 5, 6, 7, 8, 9] } // numeric sort for the rest
+                { orderable: false, targets: [0, 1, 2] } 
             ]
         });
     });
 </script>
 
-</body>
-</html>
+{% endblock %}
