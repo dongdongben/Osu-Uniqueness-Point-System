@@ -86,6 +86,27 @@
     #upTable tbody td:focus {
         outline: none;
     }
+
+    /* Center the DataTables wrapper */
+    .dataTables_wrapper {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto !important;
+    }
+
+    /* Remove DataTables' default striping */
+    table.dataTable.stripe tbody tr.odd,
+    table.dataTable.display tbody tr.odd,
+    table.dataTable.stripe tbody tr.even,
+    table.dataTable.display tbody tr.even {
+    background-color: #fff !important;
+    }
+
+    /* Keep your pink left bar on hover (works with border-collapse) */
+    #upTable tbody tr:hover td:first-child {
+    box-shadow: inset 4px 0 0 #ff66aa !important;
+    }
+
     </style>
 </head>
 <body>
@@ -137,19 +158,20 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-$(function () {
+$(document).ready(function () {
   $('#upTable').DataTable({
-    order: [[4, 'desc']],              // default sort by Uniqueness PP
+    order: [[4, 'desc']],
     pageLength: 100,
     lengthChange: false,
-    searching: false,
     ordering: true,
+    searching: false,
+    stripeClasses: [],                 // ← no alternating greys
     columnDefs: [
-      { orderable: false, targets: [0, 1, 2] },      // no sort on Placement, Beatmap ID, Title
-      { type: 'num', targets: [3, 4, 5, 6, 7, 8, 9] } // numeric sort elsewhere
+      { orderable: false, targets: [0, 1, 2] }
     ]
   });
 });
+
 </script>
 
 {% endblock %}
