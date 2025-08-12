@@ -68,67 +68,69 @@
 
 
 {% extends "base.html" %}
-{% block title %}...{% endblock %}
+{% block title %}{{ name }}'s Top Plays{% endblock %}
+
 {% block content %}
 <h1>{{ name }}'s Top Plays</h1>
 
+<!-- It’s fine to load CSS here; head isn’t required -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
 <table id="upTable">
-    <thead>
+  <thead>
     <tr>
-        <th>Placement</th>
-        <th>Beatmap ID</th>
-        <th>Title</th>
-        <th>Base PP</th>
-        <th>Uniqueness PP</th>
-        <th>Delta</th>
-        <th>Appearance Count</th>
-        <th>Skewness</th>
-        <th>Popularity Index</th>
-        <th>Factor</th>
+      <th>Placement</th>
+      <th>Beatmap ID</th>
+      <th>Title</th>
+      <th>Base PP</th>
+      <th>Uniqueness PP</th>
+      <th>Delta</th>
+      <th>Appearance Count</th>
+      <th>Skewness</th>
+      <th>Popularity Index</th>
+      <th>Factor</th>
     </tr>
-    </thead>
-    <tbody>
+  </thead>
+  <tbody>
     {% for play in scores %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ play.BeatmapID }}</td>
-            <td>{{ play.BeatmapName }}</td>
-            <td>{{ "%.2f"|format(play.BasePP) }}</td>
-            <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
-            <td>{{ "%.2f"|format(play.Delta) }}</td>
-            <td>{{ play.AppearanceCount }}</td>
-            <td>{{ "%.3f"|format(play.Skewness) }}</td>
-            <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
-            <td>{{ "%.3f"|format(play.Factor) }}</td>
-        </tr>
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ play.BeatmapID }}</td>
+      <td>{{ play.BeatmapName }}</td>
+      <td>{{ "%.2f"|format(play.BasePP) }}</td>
+      <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
+      <td>{{ "%.2f"|format(play.Delta) }}</td>
+      <td>{{ play.AppearanceCount }}</td>
+      <td>{{ "%.3f"|format(play.Skewness) }}</td>
+      <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
+      <td>{{ "%.3f"|format(play.Factor) }}</td>
+    </tr>
     {% endfor %}
-    </tbody>
+  </tbody>
 </table>
 
-{% endblock %}
-
-<!-- jQuery & DataTables -->
+<!-- jQuery + DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
-  $(document).ready(function () {
-    $('#upTable').DataTable({
-      // Default sort by Uniqueness PP (column index 4)
-      order: [[4, 'desc']],
-      paging: false,
-      searching: false,
-      lengthChange: false,
-      // Make all columns clickable/sortable by default,
-      // and explicitly mark numeric ones as numeric for correct sorting.
-      columnDefs: [
-        // numeric columns: Base PP(3), Uniqueness PP(4), Delta(5), Appearance(6), Skewness(7), Popularity(8), Factor(9)
-        { targets: [3,4,5,6,7,8,9], type: 'num' }
-        // no blanket "orderable: false" rule
-      ]
-    });
+$(function () {
+  // Make sure it runs; you should see this in DevTools console once.
+  console.log('Initializing DataTable on #upTable');
+
+  $('#upTable').DataTable({
+    pageLength: 100,
+    lengthChange: false,
+    searching: true,
+    ordering: true,
+    // Treat numeric columns as numeric
+    columnDefs: [
+      { type: 'num', targets: [0,1,3,4,5,6,7,8,9] },
+      // Only these columns are sortable; disable Beatmap Title if you want
+      { orderable: true, targets: [0,1,2,3,4,5,6,7,8,9] }
+    ],
+    order: [[4, 'desc']] // default: Uniqueness PP desc
   });
+});
 </script>
-
-
-</body>
-</html>
+{% endblock %}
