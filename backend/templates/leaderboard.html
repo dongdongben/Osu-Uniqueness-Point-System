@@ -111,19 +111,24 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $('#upTable').DataTable({
-            order: [[3, 'desc']], // Default sort by Uniqueness PP
-            paging: false,
-            searching: false,
-            lengthChange: false,
-            columnDefs: [
-                { orderable: true, targets: [3, 4] },  // Allow sorting on UP and Delta
-                { orderable: false, targets: '_all' } // Disable sorting for all other columns
-            ]
-        });
+  $(document).ready(function () {
+    $('#upTable').DataTable({
+      // Default sort by Uniqueness PP (column index 4)
+      order: [[4, 'desc']],
+      paging: false,
+      searching: false,
+      lengthChange: false,
+      // Make all columns clickable/sortable by default,
+      // and explicitly mark numeric ones as numeric for correct sorting.
+      columnDefs: [
+        // numeric columns: Base PP(3), Uniqueness PP(4), Delta(5), Appearance(6), Skewness(7), Popularity(8), Factor(9)
+        { targets: [3,4,5,6,7,8,9], type: 'num' }
+        // no blanket "orderable: false" rule
+      ]
     });
+  });
 </script>
+
 
 </body>
 </html>
