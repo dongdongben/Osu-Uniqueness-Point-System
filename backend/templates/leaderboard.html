@@ -107,22 +107,25 @@
     </tbody>
 </table>
 
-{% endblock %}
-
+<!-- DataTables (put inside the block so it renders) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $('#upTable').DataTable({
-            order: [[4, 'desc']], // default sort by Uniqueness PP
-            pageLength: 100,
-            lengthChange: false,
-            ordering: true,
-            searching: false,
-            columnDefs: [
-                { orderable: false, targets: [0, 1, 2] } // Disable sorting for Rank & Player
-            ]
-        });
-    });
+$(function () {
+  $('#upTable').DataTable({
+    order: [[4, 'desc']],              // default sort by Uniqueness PP
+    pageLength: 100,
+    lengthChange: false,
+    searching: false,
+    ordering: true,
+    columnDefs: [
+      { orderable: false, targets: [0, 1, 2] },      // no sort on Placement, Beatmap ID, Title
+      { type: 'num', targets: [3, 4, 5, 6, 7, 8, 9] } // numeric sort elsewhere
+    ]
+  });
+});
 </script>
+
+{% endblock %}
