@@ -64,72 +64,66 @@
         }
     </style>
 </head>
-
-
 <body>
-{% extends "base.html" %}
-{% block title %}{{ name }}'s Top Plays{% endblock %}
 
+
+{% extends "base.html" %}
+{% block title %}...{% endblock %}
 {% block content %}
 <h1>{{ name }}'s Top Plays</h1>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
 <table id="upTable">
-  <thead>
+    <thead>
     <tr>
-      <th>Placement</th>
-      <th>Beatmap ID</th>
-      <th>Title</th>
-      <th>Base PP</th>
-      <th>Uniqueness PP</th>
-      <th>Delta</th>
-      <th>Appearance Count</th>
-      <th>Skewness</th>
-      <th>Popularity Index</th>
-      <th>Multiplier</th> <!-- was Factor -->
+        <th>Placement</th>
+        <th>Beatmap ID</th>
+        <th>Title</th>
+        <th>Base PP</th>
+        <th>Uniqueness PP</th>
+        <th>Delta</th>
+        <th>Appearance Count</th>
+        <th>Skewness</th>
+        <th>Popularity Index</th>
+        <th>Factor</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     {% for play in scores %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ play.BeatmapID }}</td>
-      <td>{{ play.BeatmapName }}</td>
-      <td>{{ "%.2f"|format(play.BasePP) }}</td>
-      <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
-      <td>{{ "%.2f"|format(play.Delta) }}</td>
-      <td>{{ play.AppearanceCount }}</td>
-      <td>{{ "%.3f"|format(play.Skewness) }}</td>
-      <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
-      <td>
-        {# Multiplier = UniquenessPP / BasePP; guard divide-by-zero #}
-        {% set mult = (play.BasePP and play.UniquenessPP) and (play.UniquenessPP / play.BasePP) or 0 %}
-        {{ "%.3f"|format(mult) }}
-      </td>
-    </tr>
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ play.BeatmapID }}</td>
+            <td>{{ play.BeatmapName }}</td>
+            <td>{{ "%.2f"|format(play.BasePP) }}</td>
+            <td>{{ "%.2f"|format(play.UniquenessPP) }}</td>
+            <td>{{ "%.2f"|format(play.Delta) }}</td>
+            <td>{{ play.AppearanceCount }}</td>
+            <td>{{ "%.3f"|format(play.Skewness) }}</td>
+            <td>{{ "%.3f"|format(play.PopularityIndex) }}</td>
+            <td>{{ "%.3f"|format(play.Factor) }}</td>
+        </tr>
     {% endfor %}
-  </tbody>
+    </tbody>
 </table>
 
+{% endblock %}
+
+<!-- jQuery & DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-$(function () {
-  $('#upTable').DataTable({
-    pageLength: 100,
-    lengthChange: false,
-    searching: true,
-    ordering: true,
-    order: [[4, 'desc']], // default sort: Uniqueness PP
-    columnDefs: [
-      // lock non-numeric/text columns
-      { orderable: false, targets: [0, 1, 2] },
-
-      // mark numeric columns as numeric for proper sorting
-      { type: 'num', targets: [3, 4, 5, 6, 7, 8, 9] }
-    ]
-  });
-});
+    $(document).ready(function () {
+        $('#upTable').DataTable({
+            order: [[3, 'desc']], // Default sort by Uniqueness PP
+            paging: false,
+            searching: false,
+            lengthChange: false,
+            columnDefs: [
+                { orderable: true, targets: [3, 4] },  // Allow sorting on UP and Delta
+                { orderable: false, targets: '_all' } // Disable sorting for all other columns
+            ]
+        });
+    });
 </script>
-{% endblock %}
+
+</body>
+</html>
