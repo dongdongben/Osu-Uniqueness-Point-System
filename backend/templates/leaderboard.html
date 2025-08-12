@@ -107,22 +107,29 @@
     </tbody>
 </table>
 
-<!-- jQuery & DataTables -->
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
 <script>
     $(document).ready(function () {
         $('#upTable').DataTable({
             order: [[4, 'desc']], // default sort by Uniqueness PP
-            pageLength: 50,
             lengthChange: false,
             ordering: true,
             searching: false,
             columnDefs: [
-                { orderable: false, targets: [0, 1, 2] } 
+                { orderable: false, targets: [0, 1, 2] } // Disable sorting for Rank & Player
             ]
         });
     });
 </script>
-
 {% endblock %}
